@@ -44,18 +44,18 @@ describe('Today flow', () => {
     render(<App />)
     await addTasks(user, 'a', 'b')
 
-    await user.click(screen.getByRole('checkbox', { name: 'Mark done: a' }))
+    await user.click(screen.getByRole('checkbox', { name: 'a' }))
     expect(texts('To do')).toEqual(['b'])
     expect(texts('Done')).toEqual(['a'])
     expect(
-      screen.getByRole('checkbox', { name: 'Mark not done: a' }),
+      screen.getByRole('checkbox', { name: 'a' }),
     ).toHaveFocus()
 
-    await user.click(screen.getByRole('checkbox', { name: 'Mark done: b' }))
+    await user.click(screen.getByRole('checkbox', { name: 'b' }))
     expect(screen.getByText('All done for today.')).toBeVisible()
     expect(screen.getByText('2 of 2 done')).toBeVisible()
 
-    await user.click(screen.getByRole('checkbox', { name: 'Mark not done: a' }))
+    await user.click(screen.getByRole('checkbox', { name: 'a' }))
     expect(texts('To do')).toEqual(['a'])
   })
 
@@ -67,12 +67,12 @@ describe('Today flow', () => {
     await user.click(screen.getByRole('button', { name: 'Delete task: b' }))
     expect(texts('To do')).toEqual(['a', 'c'])
     expect(screen.getByText('Task deleted')).toBeVisible()
-    expect(screen.getByRole('checkbox', { name: 'Mark done: c' })).toHaveFocus()
+    expect(screen.getByRole('checkbox', { name: 'c' })).toHaveFocus()
 
     await user.click(screen.getByRole('button', { name: 'Undo' }))
     expect(texts('To do')).toEqual(['a', 'b', 'c'])
     expect(screen.queryByText('Task deleted')).toBeNull()
-    expect(screen.getByRole('checkbox', { name: 'Mark done: b' })).toHaveFocus()
+    expect(screen.getByRole('checkbox', { name: 'b' })).toHaveFocus()
 
     await user.click(screen.getByRole('button', { name: 'Delete task: b' }))
     act(() => vi.advanceTimersByTime(UNDO_MS))

@@ -42,7 +42,7 @@ describe('TaskItem', () => {
     setup()
 
     expect(
-      screen.getByRole('checkbox', { name: 'Mark done: Buy milk' }),
+      screen.getByRole('checkbox', { name: 'Buy milk' }),
     ).not.toBeChecked()
     expect(
       screen.getByRole('button', { name: 'Edit task: Buy milk' }),
@@ -50,6 +50,23 @@ describe('TaskItem', () => {
     expect(
       screen.getByRole('button', { name: 'Delete task: Buy milk' }),
     ).toBeVisible()
+  })
+
+  it('draws a visible focus ring: outline-solid on :focus-visible (US-7, NFR-3)', () => {
+    setup()
+
+    for (const el of [
+      screen.getByRole('checkbox'),
+      screen.getByRole('button', { name: 'Edit task: Buy milk' }),
+      screen.getByRole('button', { name: 'Delete task: Buy milk' }),
+    ]) {
+      expect(el).toHaveClass(
+        'outline-hidden',
+        'focus-visible:outline-solid',
+        'focus-visible:outline-2',
+        'focus-visible:outline-offset-2',
+      )
+    }
   })
 
   it('toggles with Tab then Space (AC-2.4)', async () => {
@@ -67,7 +84,7 @@ describe('TaskItem', () => {
     setup({ done: true, completedAt: 2, completedDate: '2026-10-23' })
 
     expect(
-      screen.getByRole('checkbox', { name: 'Mark not done: Buy milk' }),
+      screen.getByRole('checkbox', { name: 'Buy milk' }),
     ).toBeChecked()
     expect(screen.getByText('Buy milk').closest('button')).toHaveClass(
       'line-through',

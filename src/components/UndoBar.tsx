@@ -38,7 +38,7 @@ export function UndoBar({
           <button
             type="button"
             onClick={onUndo}
-            className="min-h-11 min-w-11 rounded-sm px-3 font-semibold text-toast-action outline-none hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-toast-action"
+            className="min-h-11 min-w-11 rounded-sm px-3 font-semibold text-toast-action outline-hidden hover:underline focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-toast-action"
           >
             Undo
           </button>
