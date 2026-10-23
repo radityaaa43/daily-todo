@@ -30,6 +30,8 @@ export interface UseTasks {
   edit(id: string, raw: string): boolean
   remove(id: string): void
   undo(): void
+  pauseUndo(): void
+  resumeUndo(): void
   pendingUndo: Task | null
 }
 
@@ -127,6 +129,14 @@ export function useTasks(todayKey: DateKey): UseTasks {
     [commit, closeUndo],
   )
 
+  const pauseUndo = useCallback(() => clearTimeout(timerRef.current), [])
+
+  const resumeUndo = useCallback(() => {
+    if (!pendingRef.current) return
+    clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(closeUndo, UNDO_MS)
+  }, [closeUndo])
+
   const undo = useCallback(() => {
     const task = pendingRef.current
     if (!task) return
@@ -146,6 +156,8 @@ export function useTasks(todayKey: DateKey): UseTasks {
     edit,
     remove,
     undo,
+    pauseUndo,
+    resumeUndo,
     pendingUndo,
   }
 }

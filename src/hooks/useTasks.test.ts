@@ -131,6 +131,32 @@ describe('undo window (AC-3.2, AC-3.3, AC-3.4)', () => {
     expect(result.current.tasks).toHaveLength(1)
   })
 
+  it('pauseUndo holds the window open; resumeUndo restarts the full 5000 ms', () => {
+    const { result } = setup()
+    const [a] = result.current.tasks
+    act(() => result.current.remove(a.id))
+    act(() => result.current.pauseUndo())
+    act(() => {
+      vi.advanceTimersByTime(UNDO_MS * 3)
+    })
+    expect(result.current.pendingUndo).not.toBeNull()
+    act(() => result.current.resumeUndo())
+    act(() => {
+      vi.advanceTimersByTime(UNDO_MS - 1)
+    })
+    expect(result.current.pendingUndo).not.toBeNull()
+    act(() => {
+      vi.advanceTimersByTime(1)
+    })
+    expect(result.current.pendingUndo).toBeNull()
+  })
+
+  it('resumeUndo with nothing pending does nothing', () => {
+    const { result } = setup()
+    act(() => result.current.resumeUndo())
+    expect(result.current.pendingUndo).toBeNull()
+  })
+
   it('deleting another task ends the previous window; only the latest can be undone', () => {
     const { result } = setup()
     const [a, b] = result.current.tasks

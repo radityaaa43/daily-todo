@@ -4,9 +4,19 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { UseTasks } from '@/hooks/useTasks'
 import App from './App.tsx'
 
-const state: Pick<UseTasks, 'progress' | 'storageStatus'> = {
+const noop = () => {}
+const state: UseTasks = {
+  tasks: [],
   progress: { done: 0, total: 0 },
   storageStatus: 'ok',
+  add: () => true,
+  toggle: noop,
+  edit: () => true,
+  remove: noop,
+  undo: noop,
+  pauseUndo: noop,
+  resumeUndo: noop,
+  pendingUndo: null,
 }
 
 vi.mock('@/hooks/useToday', () => ({
@@ -26,7 +36,7 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: 'Today' })).toBeVisible()
     expect(screen.getByText(/23/)).toBeVisible()
     expect(screen.queryByText(/done/)).not.toBeInTheDocument()
-    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(screen.queryByText(/can't be saved/)).not.toBeInTheDocument()
   })
 
   it('shows progress from useTasks (AC-2.3)', () => {
@@ -40,8 +50,10 @@ describe('App', () => {
     state.storageStatus = 'unavailable'
     render(<App />)
 
-    expect(screen.getByRole('status')).toHaveTextContent(
-      "Your tasks can't be saved on this device and will be lost when you close this tab.",
-    )
+    expect(
+      screen.getByText(
+        "Your tasks can't be saved on this device and will be lost when you close this tab.",
+      ),
+    ).toBeVisible()
   })
 })

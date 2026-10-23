@@ -214,3 +214,15 @@
     }
   }
 }
+
+/* Row add and toast enter (design 3.6): opacity + small slide, no looping motion */
+@keyframes enter {
+  from {
+    opacity: 0;
+    translate: 0 var(--enter-y, 4px);
+  }
+}
+
+@utility animate-enter {
+  animation: enter var(--duration-base) cubic-bezier(0.2, 0.8, 0.2, 1);
+}
