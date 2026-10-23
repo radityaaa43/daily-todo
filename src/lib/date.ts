@@ -1,11 +1,18 @@
-// TEMPORARY: subset of the spec §3.1 contract so slice 2 can build before slice 1 (data layer) merges.
-// Slice 1 owns this file; on merge take its version.
 import type { DateKey } from './tasks'
 
+const pad = (n: number) => String(n).padStart(2, '0')
+
 export function toDateKey(d: Date): DateKey {
-  const month = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${d.getFullYear()}-${month}-${day}`
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
+function utcDay(key: DateKey): number {
+  const [y, m, d] = key.split('-').map(Number)
+  return Date.UTC(y, m - 1, d)
+}
+
+export function daysBetween(from: DateKey, to: DateKey): number {
+  return Math.round((utcDay(to) - utcDay(from)) / 86_400_000)
 }
 
 export function formatHeaderDate(d: Date, locale?: string): string {
