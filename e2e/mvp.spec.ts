@@ -41,18 +41,18 @@ test.describe('US-2 complete', () => {
     await page.goto('/')
     for (const t of ['A', 'B', 'C']) await add(page, t)
     await expect(page.getByText('0 of 3 done')).toBeVisible()
-    await page.getByRole('checkbox', { name: 'Mark done: A' }).click()
+    await page.getByRole('checkbox', { name: 'A', exact: true }).click()
     await expect(page.getByText('1 of 3 done')).toBeVisible()
     await expect(items(page).last()).toContainText('A')
-    await page.getByRole('checkbox', { name: 'Mark not done: A' }).click()
+    await page.getByRole('checkbox', { name: 'A', exact: true }).click()
     await expect(items(page).first()).toContainText('A')
   })
   test('AC-2.4 keyboard toggle with Space', async ({ page }) => {
     await page.goto('/')
     await add(page, 'Kbd')
-    await page.getByRole('checkbox', { name: 'Mark done: Kbd' }).focus()
+    await page.getByRole('checkbox', { name: 'Kbd', exact: true }).focus()
     await page.keyboard.press('Space')
-    await expect(page.getByRole('checkbox', { name: 'Mark not done: Kbd' })).toBeChecked()
+    await expect(page.getByRole('checkbox', { name: 'Kbd', exact: true })).toBeChecked()
   })
 })
 
@@ -152,7 +152,7 @@ test.describe('US-5 new day', () => {
     await expect(page.getByText('today done')).toBeVisible()
     await expect(page.getByText('from 3 days ago')).toBeVisible()
     await expect(page.getByText('from yesterday')).toBeVisible()
-    await expect(page.getByRole('checkbox', { name: /Mark done: three days/ })).not.toBeChecked()
+    await expect(page.getByRole('checkbox', { name: /three days/ })).not.toBeChecked()
   })
   test('AC-5.4 open page rolls over within 60 s of midnight', async ({ page }) => {
     const base = new Date()
@@ -169,9 +169,9 @@ test.describe('US-5 new day', () => {
   test('AC-5.5 done task same day stays', async ({ page }) => {
     await page.goto('/')
     await add(page, 'X')
-    await page.getByRole('checkbox', { name: 'Mark done: X' }).click()
+    await page.getByRole('checkbox', { name: 'X', exact: true }).click()
     await page.reload()
-    await expect(page.getByRole('checkbox', { name: 'Mark not done: X' })).toBeChecked()
+    await expect(page.getByRole('checkbox', { name: 'X', exact: true })).toBeChecked()
   })
   test('AC-5.6 header date', async ({ page }) => {
     await page.goto('/')
@@ -187,10 +187,10 @@ test.describe('US-6 persistence', () => {
     await page.goto('/')
     await add(page, 'P1')
     await add(page, 'P2')
-    await page.getByRole('checkbox', { name: 'Mark done: P1' }).click()
+    await page.getByRole('checkbox', { name: 'P1', exact: true }).click()
     await page.reload()
     await expect(items(page)).toHaveCount(2)
-    await expect(page.getByRole('checkbox', { name: 'Mark not done: P1' })).toBeChecked()
+    await expect(page.getByRole('checkbox', { name: 'P1', exact: true })).toBeChecked()
   })
   test('AC-6.1 browser restart (persistent profile)', async ({ playwright, baseURL }) => {
     const dir = test.info().outputPath('profile')
@@ -213,7 +213,7 @@ test.describe('US-6 persistence', () => {
     await page.reload()
     await expect(page.getByPlaceholder('Add task')).toBeVisible()
     await add(page, 'Offline task')
-    await page.getByRole('checkbox', { name: 'Mark done: Offline task' }).click()
+    await page.getByRole('checkbox', { name: 'Offline task', exact: true }).click()
     await expect(page.getByText('1 of 1 done')).toBeVisible()
   })
   test('AC-6.3 storage blocked shows notice, still works', async ({ page }) => {
@@ -252,7 +252,7 @@ test.describe('US-7 states', () => {
     await page.goto('/')
     await add(page, 'Z')
     await expect(page.getByText('All done for today.')).toHaveCount(0)
-    await page.getByRole('checkbox', { name: 'Mark done: Z' }).click()
+    await page.getByRole('checkbox', { name: 'Z', exact: true }).click()
     const msg = page.getByText('All done for today.')
     await expect(msg).toBeVisible()
     const mb = (await msg.boundingBox())!
@@ -297,8 +297,13 @@ test.describe('NFR', () => {
     await page.keyboard.press('Enter')
     await page.keyboard.press('Tab') // add button
     await page.keyboard.press('Tab') // checkbox
-    await expect(page.getByRole('checkbox', { name: 'Mark done: Kb one' })).toBeFocused()
+    const checkbox = page.getByRole('checkbox', { name: 'Kb one', exact: true })
+    await expect(checkbox).toBeFocused()
+    // Focus ring is drawn on keyboard focus (Tailwind 4 outline-none and outline-hidden both set outline-style: none).
+    await expect(checkbox).toHaveCSS('outline-style', 'solid')
+    await expect(checkbox).toHaveCSS('outline-width', '2px')
     await page.keyboard.press('Tab')
+    await expect(page.getByRole('button', { name: /^Edit task:/ })).toHaveCSS('outline-style', 'solid')
     await page.keyboard.press('Enter') // edit
     await expect(page.getByLabel('Edit task')).toBeFocused()
     await page.keyboard.press('Escape')

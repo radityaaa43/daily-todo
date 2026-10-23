@@ -31,6 +31,7 @@ export function TaskItem({
   const textRef = useRef<HTMLButtonElement>(null)
   // Set once an edit is saved or cancelled, so the blur fired by unmounting the field is ignored.
   const finished = useRef(false)
+  const textId = `text-${task.id}`
   const carriedId = `carried-${task.id}`
   const countId = `count-${task.id}`
 
@@ -71,7 +72,8 @@ export function TaskItem({
         <Checkbox
           checked={task.done}
           onCheckedChange={() => onToggle(task.id)}
-          aria-label={`${task.done ? 'Mark not done' : 'Mark done'}: ${task.text}`}
+          aria-labelledby={textId}
+          aria-label={task.text}
           aria-describedby={carriedLabel ? carriedId : undefined}
           className="relative after:absolute after:-inset-[11px] after:content-['']"
         />
@@ -95,7 +97,7 @@ export function TaskItem({
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={onKeyDown}
               onBlur={() => finish(true, false)}
-              className="my-0.5 min-h-10 w-full min-w-0 rounded-sm border-2 border-primary bg-surface px-2 py-1.5 text-body text-text outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="my-0.5 min-h-10 w-full min-w-0 rounded-sm border-2 border-primary bg-surface px-2 py-1.5 text-body text-text outline-hidden focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             />
             <CharCounter id={countId} length={draft.length} />
             {isFinePointer() && (
@@ -111,13 +113,13 @@ export function TaskItem({
             aria-label={`Edit task: ${task.text}`}
             onClick={startEdit}
             className={cn(
-              'min-h-11 w-full cursor-text rounded-sm py-2 text-left text-body wrap-anywhere outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+              'min-h-11 w-full cursor-text rounded-sm py-2 text-left text-body wrap-anywhere outline-hidden focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
               task.done
                 ? 'text-subtle line-through decoration-[1.5px]'
                 : 'text-text',
             )}
           >
-            <span>{task.text}</span>
+            <span id={textId}>{task.text}</span>
           </button>
         )}
         {carriedLabel && (
