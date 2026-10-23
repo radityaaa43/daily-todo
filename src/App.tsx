@@ -18,6 +18,8 @@ export default function App() {
     edit,
     remove,
     undo,
+    pauseUndo,
+    resumeUndo,
     pendingUndo,
   } = useTasks(todayKey)
 
@@ -44,7 +46,12 @@ export default function App() {
           />
         </main>
       </div>
-      <UndoBar pendingUndo={pendingUndo} onUndo={restore} />
+      <UndoBar
+        pendingUndo={pendingUndo}
+        onUndo={restore}
+        onPause={pauseUndo}
+        onResume={resumeUndo}
+      />
     </div>
   )
 }

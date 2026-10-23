@@ -80,6 +80,36 @@ describe('Today flow', () => {
     expect(screen.queryByRole('button', { name: 'Undo' })).toBeNull()
   })
 
+  it('keeps the toast while hovered, then closes 5 s after the pointer leaves (C-6)', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    render(<App />)
+    await addTasks(user, 'a')
+
+    await user.click(screen.getByRole('button', { name: 'Delete task: a' }))
+    await user.hover(screen.getByText('Task deleted'))
+    act(() => vi.advanceTimersByTime(UNDO_MS * 2))
+    expect(screen.getByText('Task deleted')).toBeVisible()
+
+    await user.unhover(screen.getByText('Task deleted'))
+    act(() => vi.advanceTimersByTime(UNDO_MS))
+    expect(screen.queryByText('Task deleted')).toBeNull()
+  })
+
+  it('keeps the toast while Undo has keyboard focus, then closes 5 s after blur (C-6)', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    render(<App />)
+    await addTasks(user, 'a')
+
+    await user.click(screen.getByRole('button', { name: 'Delete task: a' }))
+    act(() => screen.getByRole('button', { name: 'Undo' }).focus())
+    act(() => vi.advanceTimersByTime(UNDO_MS * 2))
+    expect(screen.getByText('Task deleted')).toBeVisible()
+
+    act(() => screen.getByRole('button', { name: 'Undo' }).blur())
+    act(() => vi.advanceTimersByTime(UNDO_MS))
+    expect(screen.queryByText('Task deleted')).toBeNull()
+  })
+
   it('moves focus to the input when the last task is deleted', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
     render(<App />)

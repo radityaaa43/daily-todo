@@ -11,7 +11,9 @@ export function isFinePointer(): boolean {
 
 export function focusTaskCheckbox(id: string): void {
   document
-    .querySelector<HTMLElement>(`[data-task-id="${id}"] [role="checkbox"]`)
+    .querySelector<HTMLElement>(
+      `[data-task-id="${CSS.escape(id)}"] [role="checkbox"]`,
+    )
     ?.focus()
 }
 

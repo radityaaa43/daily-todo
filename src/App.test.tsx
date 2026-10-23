@@ -14,6 +14,8 @@ const state: UseTasks = {
   edit: () => true,
   remove: noop,
   undo: noop,
+  pauseUndo: noop,
+  resumeUndo: noop,
   pendingUndo: null,
 }
 

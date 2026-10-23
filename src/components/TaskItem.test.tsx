@@ -157,7 +157,7 @@ describe('TaskItem', () => {
     expect(screen.getByText('Max 200 characters')).toBeVisible()
   })
 
-  it('shows the keyboard hint on fine pointers only', async () => {
+  it('hides the keyboard hint on coarse pointers', async () => {
     const user = userEvent.setup()
     setup()
     await startEdit(user)
